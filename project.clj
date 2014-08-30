@@ -2,6 +2,9 @@
   :description "FIXME: write this!"
   :url "http://example.com/FIXME"
 
+  :license {:name "MIT"
+            :url "http://opensource.org/licenses/MIT"}
+
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/clojurescript "0.0-2311"]
                  [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
