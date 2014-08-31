@@ -1,6 +1,7 @@
 (ns leftover.core
   (:require [om.core :as om :include-macros true]
-            [om.dom :as dom :include-macros true]))
+            [om.dom :as dom :include-macros true]
+            [om-bootstrap.button :as obb]))
 
 (enable-console-print!)
 
@@ -10,6 +11,9 @@
   (fn [app owner]
     (reify om/IRender
       (render [_]
-        (dom/h1 nil (:text app)))))
+        (dom/div #js {:id "content" :className "col-sm-6"}
+                 (obb/toolbar {}
+                              (obb/button {:onClick (fn [] (js/alert "test"))} (:text app))
+                              )))))
   app-state
   {:target (. js/document (getElementById "app"))})
