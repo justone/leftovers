@@ -8,17 +8,25 @@
   :dependencies [[org.clojure/clojure "1.6.0"]
                  [org.clojure/clojurescript "0.0-2311"]
                  [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
+                 [figwheel  "0.1.4-SNAPSHOT"]
                  [om "0.7.1"]]
 
-  :plugins [[lein-cljsbuild "1.0.4-SNAPSHOT"]]
+  :plugins [[lein-cljsbuild "1.0.4-SNAPSHOT"]
+            [lein-figwheel  "0.1.4-SNAPSHOT"]]
 
   :source-paths ["src"]
 
+  ; figwheel config
+  :figwheel {
+             :http-server-root "public"
+             :port 3449
+             :css-dirs ["resources/public/css"]}
+
   :cljsbuild { 
     :builds [{:id "leftover"
-              :source-paths ["src"]
+              :source-paths ["src/leftover" "src/figwheel"]
               :compiler {
-                :output-to "leftover.js"
-                :output-dir "out"
+                :output-to "resources/public/leftover.js"
+                :output-dir "resources/public/out"
                 :optimizations :none
                 :source-map true}}]})
