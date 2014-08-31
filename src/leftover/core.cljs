@@ -11,12 +11,10 @@
   (fn [app owner]
     (reify om/IRender
       (render [_]
-        (dom/div #js {:id "content" :className "col-sm-6"}
-                 (obb/toolbar {}
-                              (obb/button {
-                                           :bs-style "primary"
-                                           :onClick (fn [] (js/alert "test"))
-                                           }
-                                          (:text app)))))))
+        (dom/div #js {:className "col-sm-6"}
+                 (obb/button-group {:justified? true}
+                                   (obb/button-group {} (obb/button { :bs-style "primary" :onClick (fn [] (js/alert "Add Receipt!")) } "Add Receipt"))
+                                   (obb/button-group {} (obb/button { :bs-style "primary" :onClick (fn [] (js/alert "View History!")) } "View History"))
+                                   )))))
   app-state
   {:target (. js/document (getElementById "app"))})
