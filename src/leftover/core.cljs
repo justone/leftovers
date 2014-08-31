@@ -13,7 +13,10 @@
       (render [_]
         (dom/div #js {:id "content" :className "col-sm-6"}
                  (obb/toolbar {}
-                              (obb/button {:onClick (fn [] (js/alert "test"))} (:text app))
-                              )))))
+                              (obb/button {
+                                           :bs-style "primary"
+                                           :onClick (fn [] (js/alert "test"))
+                                           }
+                                          (:text app)))))))
   app-state
   {:target (. js/document (getElementById "app"))})
