@@ -10,7 +10,8 @@
                  [org.clojure/core.async "0.1.267.0-0d7780-alpha"]
                  [figwheel "0.1.4-SNAPSHOT"]
                  [racehub/om-bootstrap "0.2.6"]
-                 [om "0.7.1"]]
+                 [om "0.7.1"]
+                 [prismatic/om-tools "0.3.2"]]
 
   :plugins [[lein-cljsbuild "1.0.4-SNAPSHOT"]
             [lein-figwheel  "0.1.4-SNAPSHOT"]]
