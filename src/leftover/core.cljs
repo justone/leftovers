@@ -10,7 +10,7 @@
 (enable-console-print!)
 
 (def app-state (atom {
-                      :state "enter-payment"
+                      :state :enter-payment
                       :start-amount 524.15
                       :previous-payments [
                                           {:when "yesterday"
@@ -53,7 +53,7 @@
                    (obi/input {:type "text" :placeholder "Location"})
                    (obi/input {:type "text" :placeholder "Amount"})
                    (obb/button-group {:justified? true}
-                                     (obb/button-group {} (obb/button { :bs-style "success" :on-click (fn [] (put! actions {:type "add-payment"})) } "Add")))))))))
+                                     (obb/button-group {} (obb/button { :bs-style "success" :on-click (fn [] (put! actions {:type :add-payment})) } "Add")))))))))
 
 (defn button-bar [app owner]
   (reify om/IRender
@@ -61,8 +61,8 @@
       (let [actions (om/get-shared owner :actions)]
         (dom/div {:class "col-sm-6 component"}
                  (obb/button-group {:justified? true}
-                                   (obb/button-group {} (obb/button { :bs-style "primary" :on-click (fn [] (put! actions {:type "enter-payment"})) } "Enter Payment"))
-                                   (obb/button-group {} (obb/button { :bs-style "primary" :on-click (fn [] (put! actions {:type "view-history"})) } "View History"))))))))
+                                   (obb/button-group {} (obb/button { :bs-style "primary" :on-click (fn [] (put! actions {:type :enter-payment})) } "Enter Payment"))
+                                   (obb/button-group {} (obb/button { :bs-style "primary" :on-click (fn [] (put! actions {:type :view-history})) } "View History"))))))))
 
 (defn running-total [app owner]
   (reify om/IRender
@@ -77,17 +77,17 @@
         (om/build running-total app)
         (om/build button-bar app)
         (case (:state app)
-          "enter-payment" (om/build enter-payment app)
-          "view-history" (om/build view-history app)))))) 
+          :enter-payment (om/build enter-payment app)
+          :view-history (om/build view-history app)))))) 
 
 (def actions (chan))
 
 (go (loop []
       (let [action (<! actions)]
         (case (:type action)
-          "enter-payment" (swap! app-state assoc :state "enter-payment")
-          "view-history" (swap! app-state assoc :state "view-history")
-          "add-payment" (.log js/console "add"))
+          :enter-payment (swap! app-state assoc :state :enter-payment)
+          :view-history (swap! app-state assoc :state :view-history)
+          :add-payment (.log js/console "add"))
         (recur))))
 
 (om/root
