@@ -62,6 +62,12 @@
                                  (obb/button-group {} (obb/button { :bs-style "primary" :on-click (fn [] (put! actions {:type "enter-payment"})) } "Enter Payment"))
                                  (obb/button-group {} (obb/button { :bs-style "primary" :on-click (fn [] (put! actions {:type "view-history"})) } "View History")))))))
 
+(defn running-total [app owner]
+  (reify om/IRender
+    (render [this]
+      (dom/h3 {:class "col-sm-6 currenttotal"} 
+               (str "Current Total: " (apply - (:start-amount app) (map :amount (:previous-payments app))))))))
+
 (defn main-view [app owner]
   (reify
     om/IInitState
@@ -81,6 +87,7 @@
     om/IRenderState
     (render-state [this {:keys [actions]}]
       (dom/div
+        (om/build running-total app)
         (om/build button-bar app {:init-state {:actions actions}})
         (case (:state app)
           "enter-payment" (om/build enter-payment app {:init-state {:actions actions}})
