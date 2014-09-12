@@ -45,22 +45,24 @@
                ))))
 
 (defn enter-payment [app owner]
-  (reify om/IRenderState
-    (render-state [this {:keys [actions]}]
-      (dom/div {:class "col-sm-6 component"}
-               (dom/form
-                 (obi/input {:type "text" :placeholder "Location"})
-                 (obi/input {:type "text" :placeholder "Amount"})
-                 (obb/button-group {:justified? true}
-                                 (obb/button-group {} (obb/button { :bs-style "success" :on-click (fn [] (put! actions {:type "add-payment"})) } "Add"))))))))
+  (reify om/IRender
+    (render [this]
+      (let [actions (om/get-shared owner :actions)]
+        (dom/div {:class "col-sm-6 component"}
+                 (dom/form
+                   (obi/input {:type "text" :placeholder "Location"})
+                   (obi/input {:type "text" :placeholder "Amount"})
+                   (obb/button-group {:justified? true}
+                                     (obb/button-group {} (obb/button { :bs-style "success" :on-click (fn [] (put! actions {:type "add-payment"})) } "Add")))))))))
 
 (defn button-bar [app owner]
-  (reify om/IRenderState
-    (render-state [this {:keys [actions]}]
-      (dom/div {:class "col-sm-6 component"}
-               (obb/button-group {:justified? true}
-                                 (obb/button-group {} (obb/button { :bs-style "primary" :on-click (fn [] (put! actions {:type "enter-payment"})) } "Enter Payment"))
-                                 (obb/button-group {} (obb/button { :bs-style "primary" :on-click (fn [] (put! actions {:type "view-history"})) } "View History")))))))
+  (reify om/IRender
+    (render [this]
+      (let [actions (om/get-shared owner :actions)]
+        (dom/div {:class "col-sm-6 component"}
+                 (obb/button-group {:justified? true}
+                                   (obb/button-group {} (obb/button { :bs-style "primary" :on-click (fn [] (put! actions {:type "enter-payment"})) } "Enter Payment"))
+                                   (obb/button-group {} (obb/button { :bs-style "primary" :on-click (fn [] (put! actions {:type "view-history"})) } "View History"))))))))
 
 (defn running-total [app owner]
   (reify om/IRender
@@ -69,31 +71,27 @@
                (str "Current Total: " (apply - (:start-amount app) (map :amount (:previous-payments app))))))))
 
 (defn main-view [app owner]
-  (reify
-    om/IInitState
-    (init-state [_]
-      {:actions (chan)})
-    om/IWillMount
-    (will-mount [_]
-      (let [actions (om/get-state owner :actions)]
-        (go (loop []
-              (let [action (<! actions)]
-                (case (:type action)
-                  "enter-payment" (om/transact! app :state (fn [_] "enter-payment"))
-                  "view-history" (om/transact! app :state (fn [_] "view-history"))
-                  "add-payment" (.log js/console "add")
-                  )
-                (recur))))))
-    om/IRenderState
-    (render-state [this {:keys [actions]}]
+  (reify om/IRender
+    (render [this]
       (dom/div
         (om/build running-total app)
-        (om/build button-bar app {:init-state {:actions actions}})
+        (om/build button-bar app)
         (case (:state app)
-          "enter-payment" (om/build enter-payment app {:init-state {:actions actions}})
+          "enter-payment" (om/build enter-payment app)
           "view-history" (om/build view-history app)))))) 
+
+(def actions (chan))
+
+(go (loop []
+      (let [action (<! actions)]
+        (case (:type action)
+          "enter-payment" (swap! app-state assoc :state "enter-payment")
+          "view-history" (swap! app-state assoc :state "view-history")
+          "add-payment" (.log js/console "add"))
+        (recur))))
 
 (om/root
   main-view
   app-state
-  {:target (. js/document (getElementById "app"))})
+  {:target (. js/document (getElementById "app"))
+   :shared {:actions actions}})
