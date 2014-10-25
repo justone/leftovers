@@ -1,0 +1,11 @@
+web:
+  build: .
+  command: lein figwheel dev
+  ports:
+   - "3449:3449"
+  volumes:
+   - .:/code
+  links:
+   - redis
+redis:
+  image: redis
