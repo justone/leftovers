@@ -92,6 +92,15 @@
                       (close! resp)))))
     resp))
 
+(defn POST
+  [url content]
+  (log (clj->js content))
+  (xhr/send
+    url
+    (fn [event] (let [res (-> event .-target .getResponseText)] (log res)))
+    "POST"
+    (.stringify js/JSON (clj->js content))))
+
 (def actions (chan))
 
 (go (loop []
@@ -115,6 +124,14 @@
   (let [data (<! (GET "http://localhost:8000/test"))
         cleaned (cleanup (js->clj (.parse js/JSON data)))]
     (swap! app-state assoc :state :enter-payment :data cleaned)))
+
+(go
+  (loop []
+    (log (<! (GET "http://localhost:8000/conn/foo/baz")))
+    (recur)))
+
+(go
+  (POST "http://localhost:8000/conn/foo" {:foo "bar"}))
 
 (om/root
   main-view
