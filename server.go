@@ -10,6 +10,7 @@ import (
 	"github.com/justone/go-minibus"
 	"github.com/martini-contrib/cors"
 	"github.com/martini-contrib/encoder"
+	// "github.com/martini-contrib/staticbin"
 )
 
 type Payment struct {
@@ -34,6 +35,9 @@ func main() {
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 	}))
+
+	// generated with "go-bindata -o ../../static.go public/..."
+	// m.Use(staticbin.Static("public", Asset))
 
 	m.Use(func(c martini.Context, w http.ResponseWriter) {
 		c.MapTo(encoder.JsonEncoder{PrettyPrint: true}, (*encoder.Encoder)(nil))
