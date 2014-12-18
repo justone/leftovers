@@ -85,7 +85,5 @@ func main() {
 
 	log.Println("Waiting for connections...")
 
-	if err := http.ListenAndServe(":8000", m); err != nil {
-		log.Fatal(err)
-	}
+	m.Run()
 }
