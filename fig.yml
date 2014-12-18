@@ -1,10 +1,17 @@
 web:
-  build: .
+  build: frontend
   command: lein figwheel dev
   ports:
    - "3449:3449"
   volumes:
-   - .:/code
+   - frontend:/code
+backend:
+  build: .
+  command: leftovers
+  ports:
+   - "8000:8000"
+  environment:
+   - PORT=8000
   links:
    - redis
 redis:
