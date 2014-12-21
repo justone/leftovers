@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/go-martini/martini"
 	"github.com/justone/go-minibus"
@@ -18,9 +19,17 @@ type Payment struct {
 	Amount   float32 `json:"amount"`
 }
 
+func (this Payment) Filter() interface{} {
+	return this
+}
+
 type Data struct {
 	StartAmount float32   `json:"start-amount"`
 	Payments    []Payment `json:"previous-payments"`
+}
+
+func (this Data) Filter() interface{} {
+	return this
 }
 
 func main() {
@@ -39,8 +48,11 @@ func main() {
 	// generated with "go-bindata -o ../../static.go public/..."
 	// m.Use(staticbin.Static("public", Asset))
 
-	m.Use(func(c martini.Context, w http.ResponseWriter) {
-		c.MapTo(encoder.JsonEncoder{PrettyPrint: true}, (*encoder.Encoder)(nil))
+	m.Use(func(c martini.Context, w http.ResponseWriter, r *http.Request) {
+		// Use indentations. &pretty=1
+		pretty, _ := strconv.ParseBool(r.FormValue("pretty"))
+
+		c.MapTo(encoder.JsonEncoder{PrettyPrint: pretty}, (*encoder.Encoder)(nil))
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	})
 
