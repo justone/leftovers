@@ -7,12 +7,12 @@ web:
    - frontend:/code
 backend:
   build: .
-  command: leftovers
+  command: gin -p 8000 -i run
   ports:
    - "8000:8000"
-  environment:
-   - PORT=8000
   links:
    - redis
+  volumes:
+   - .:/go/src/app
 redis:
   image: redis
