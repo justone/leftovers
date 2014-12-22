@@ -1,16 +1,15 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/go-martini/martini"
 	"github.com/justone/go-minibus"
 	"github.com/martini-contrib/cors"
-	"github.com/martini-contrib/encoder"
 	// "github.com/martini-contrib/staticbin"
 )
 
@@ -48,15 +47,7 @@ func main() {
 	// generated with "go-bindata -o ../../static.go public/..."
 	// m.Use(staticbin.Static("public", Asset))
 
-	m.Use(func(c martini.Context, w http.ResponseWriter, r *http.Request) {
-		// Use indentations. &pretty=1
-		pretty, _ := strconv.ParseBool(r.FormValue("pretty"))
-
-		c.MapTo(encoder.JsonEncoder{PrettyPrint: pretty}, (*encoder.Encoder)(nil))
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	})
-
-	route.Get("/test", func(enc encoder.Encoder) (int, []byte) {
+	route.Get("/test", func(res http.ResponseWriter) {
 		result := &Data{
 			513.22,
 			[]Payment{
@@ -65,9 +56,10 @@ func main() {
 			},
 		}
 
-		return http.StatusOK, encoder.Must(enc.Encode(result))
-	})
+		json, _ := json.Marshal(result)
 
+		fmt.Fprintln(res, string(json))
+	})
 	mb := minibus.Init()
 
 	route.Get("/conn/:cust/:conn", func(res http.ResponseWriter, params martini.Params) {
