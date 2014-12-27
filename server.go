@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/go-martini/martini"
 	"github.com/justone/go-minibus"
@@ -15,7 +16,7 @@ import (
 
 type Payment struct {
 	Location string  `json:"location"`
-	Amount   float32 `json:"amount"`
+	Amount   float64 `json:"amount"`
 }
 
 func (this Payment) Filter() interface{} {
@@ -23,7 +24,7 @@ func (this Payment) Filter() interface{} {
 }
 
 type Data struct {
-	StartAmount float32   `json:"start-amount"`
+	StartAmount float64   `json:"start-amount"`
 	Payments    []Payment `json:"previous-payments"`
 }
 
@@ -47,20 +48,10 @@ func main() {
 	// generated with "go-bindata -o ../../static.go public/..."
 	// m.Use(staticbin.Static("public", Asset))
 
-	route.Get("/test", func(res http.ResponseWriter) {
-		result := &Data{
-			513.22,
-			[]Payment{
-				{"Rite-aid", 5.28},
-				{"Trader Joe's", 104.22},
-			},
-		}
-
-		json, _ := json.Marshal(result)
-
-		fmt.Fprintln(res, string(json))
-	})
 	mb := minibus.Init()
+
+	payments := make([]Payment, 0)
+	initialAmount := 513.22
 
 	route.Get("/conn/:cust/:conn", func(res http.ResponseWriter, params martini.Params) {
 		cust := params["cust"]
@@ -68,7 +59,7 @@ func main() {
 
 		message, err := mb.Receive(cust, conn)
 		if err != nil {
-			http.Error(res, "Timeout", http.StatusRequestTimeout)
+			fmt.Fprintln(res, "{}")
 		} else {
 			fmt.Fprintln(res, message.Contents)
 		}
@@ -82,7 +73,33 @@ func main() {
 			return
 		}
 
-		mb.Send(cust, string(body))
+		fmt.Println("Got: ", string(body))
+
+		var data map[string]interface{}
+		err = json.Unmarshal(body, &data)
+		if err != nil {
+			fmt.Println("err: ", err)
+		}
+
+		args := data["args"].(map[string]interface{})
+		fmt.Println("Location : ", args["location"])
+		fmt.Println("Amount : ", args["amount"])
+
+		amount, _ := strconv.ParseFloat(args["amount"].(string), 64)
+
+		fmt.Println("appending payment!!!")
+		payments = append(payments, Payment{args["location"].(string), amount})
+
+		coredata := Data{
+			initialAmount,
+			payments,
+		}
+
+		json, _ := json.Marshal(coredata)
+
+		fmt.Println(string(json))
+
+		mb.Send(cust, string(json))
 	})
 
 	m.Action(route.Handle)

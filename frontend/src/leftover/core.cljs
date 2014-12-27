@@ -6,12 +6,21 @@
             [goog.net.XhrIo :as xhr]
             [om-bootstrap.button :as obb]
             [om-bootstrap.input :as obi]
-            [om-bootstrap.table :as obt]))
+            [om-bootstrap.table :as obt]
+            [clojure.walk :as walk]))
 
 (enable-console-print!)
 
 (def app-state (atom {:state :loading
                       :data {}}))
+
+(defn log [s]
+  (.log js/console s))
+
+(defn p "Prints given arguments, and then returns the last one"
+  [& values]
+  (.log js/console (apply js->clj values))
+  (last values))
 
 (defn hist->tr
   [hist]
@@ -37,6 +46,29 @@
   [e owner k]
   (om/set-state! owner k (.. e -target -value)))
 
+(defn valid-string
+  [name str]
+  (cond
+    (empty? str) {name "is empty"}
+    (< (.-length str) 5) {name "is too short"})) 
+
+(defn valid-number
+  [name str]
+  (cond
+    (empty? str) {name "is empty"}
+    (< (.-length str) 2) {name "is too short"})) 
+
+(defn payment-errors
+  [{:keys [location amount]}]
+  (merge (valid-string :location location) (valid-number :amount amount)))
+
+(defn add-payment
+  [actions owner state]
+  (let [errors (payment-errors state)]
+    (if (empty? errors)
+      (put! actions {:type :add-payment :args state})
+      (om/set-state! owner :errors errors))))
+
 (defn enter-payment [app owner]
   (reify
     om/IInitState
@@ -51,7 +83,7 @@
                    (obi/input {:type "text" :placeholder "Location" :value location :on-change #(handle-change % owner :location)})
                    (obi/input {:type "text" :placeholder "Amount" :value amount :on-change #(handle-change % owner :amount)})
                    (obb/button-group {:justified? true}
-                                     (obb/button-group {} (obb/button { :bs-style "success" :on-click (fn [] (put! actions {:type :add-payment :args state})) } "Add")))))))))
+                                     (obb/button-group {} (obb/button { :bs-style "success" :on-click (fn [] (add-payment actions owner state)) } "Add")))))))))
 
 (defn button-bar [app owner]
   (reify om/IRender
@@ -79,8 +111,6 @@
           :enter-payment (om/build enter-payment app)
           :view-history (om/build view-history (:data app))))))) 
 
-(defn log [s]
-  (.log js/console s))
 
 (defn GET
   [url]
@@ -94,10 +124,9 @@
 
 (defn POST
   [url content]
-  (log (clj->js content))
   (xhr/send
     url
-    (fn [event] (let [res (-> event .-target .getResponseText)] (log res)))
+    (fn [event] (let [res (-> event .-target .getResponseText)] ))
     "POST"
     (.stringify js/JSON (clj->js content))))
 
@@ -108,30 +137,21 @@
         (case (:type action)
           :enter-payment (swap! app-state assoc :state :enter-payment)
           :view-history (swap! app-state assoc :state :view-history)
-          :add-payment (.log js/console (clj->js action)))
+          :add-payment (POST "http://localhost:8000/conn/foo" (clj->js action)))
         (recur))))
-
-(defn keywordify
-  [datamap]
-  (into {} (for [[k v] datamap] [(keyword k) v])))
-
-(defn cleanup
-  [datamap]
-  {:start-amount (get datamap "start-amount")
-   :previous-payments (into [] (map keywordify (get datamap "previous-payments")))})
-
-(go
-  (let [data (<! (GET "http://localhost:8000/test"))
-        cleaned (cleanup (js->clj (.parse js/JSON data)))]
-    (swap! app-state assoc :state :enter-payment :data cleaned)))
 
 (go
   (loop []
-    (log (<! (GET "http://localhost:8000/conn/foo/baz")))
+    (log "getting more data")
+    (let [data (<! (GET "http://localhost:8000/conn/foo/baz"))
+          cleaned (walk/keywordize-keys (js->clj (.parse js/JSON data)))]
+      (log data)
+      (if (seq data)
+        (swap! app-state assoc :data cleaned)))
     (recur)))
 
-(go
-  (POST "http://localhost:8000/conn/foo" {:foo "bar"}))
+; (go
+;   (POST "http://localhost:8000/conn/foo" {:foo "bar"}))
 
 (om/root
   main-view
