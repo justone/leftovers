@@ -4,6 +4,7 @@
             [om-tools.dom :as dom :include-macros true]
             [cljs.core.async :refer [put! chan <! >! close!]]
             [goog.net.XhrIo :as xhr]
+            [goog.string :as gstring]
             [om-bootstrap.button :as obb]
             [om-bootstrap.input :as obi]
             [om-bootstrap.table :as obt]
@@ -98,7 +99,7 @@
   (reify om/IRender
     (render [this]
       (dom/h3 {:class "col-sm-6 currenttotal"} 
-               (str "Current Total: " (apply - (:start-amount data) (map :amount (:previous-payments data))))))))
+               (str "Current Total: " (gstring/format "$%.02f" (apply - (:start-amount data) (map :amount (:previous-payments data)))))))))
 
 (defn main-view [app owner]
   (reify om/IRender
