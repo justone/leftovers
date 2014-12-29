@@ -1,6 +1,6 @@
 (defproject leftover "0.1.0-SNAPSHOT"
-  :description "FIXME: write this!"
-  :url "http://example.com/FIXME"
+  :description "This is a little app to keep track of how much money is left over."
+  :url "https://github.com/justone/leftovers"
 
   :license {:name "MIT"
             :url "http://opensource.org/licenses/MIT"}
