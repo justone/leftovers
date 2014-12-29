@@ -146,8 +146,8 @@
     (log "getting more data")
     (let [data (<! (GET "http://localhost:8000/conn/foo/baz"))
           cleaned (walk/keywordize-keys (js->clj (.parse js/JSON data)))]
-      (log data)
-      (if (seq data)
+      ; (log (clj->js cleaned))
+      (if (seq cleaned)
         (swap! app-state assoc :data cleaned)))
     (recur)))
 
