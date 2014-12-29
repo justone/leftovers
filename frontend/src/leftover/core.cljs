@@ -14,18 +14,20 @@
 (def app-state (atom {:state :loading
                       :data {}}))
 
+(def base-url (str "http://" (.. js/document -location -hostname) ":8000"))
+
 (go (loop []
       (let [action (<! actions)]
         (case (:type action)
           :enter-payment (swap! app-state assoc :state :enter-payment)
           :view-history (swap! app-state assoc :state :view-history)
-          :add-payment (net/POST "http://localhost:8000/conn/foo" (clj->js action)))
+          :add-payment (net/POST (str base-url "/conn/foo") (clj->js action)))
         (recur))))
 
 (go
   (loop []
     (util/log "getting more data")
-    (let [json (<! (net/GET "http://localhost:8000/conn/foo/baz"))
+    (let [json (<! (net/GET (str base-url "/conn/foo/bar")))
           cleaned (util/json->clj json)]
       (util/log (clj->js cleaned))
       (if (seq cleaned)
