@@ -34,8 +34,12 @@
         (swap! app-state assoc :data cleaned)))
     (recur)))
 
-(om/root
-  ui/main-view
-  app-state
-  {:target (. js/document (getElementById "app"))
-   :shared {:actions actions}})
+(defn main
+  []
+  (om/root
+    ui/main-view
+    app-state
+    {:target (. js/document (getElementById "app"))
+     :shared {:actions actions}}))
+
+(main)
