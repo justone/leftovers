@@ -1,6 +1,7 @@
 (ns leftover.ui
   (:require-macros  [cljs.core.async.macros :refer [go]])
   (:require 
+    [leftover.util :as util]
     [om.core :as om :include-macros true]
     [om-tools.dom :as dom :include-macros true]
     [cljs.core.async :refer [put! chan <! >! close!]]
@@ -43,7 +44,7 @@
   [name str]
   (cond
     (empty? str) {name "is empty"}
-    (< (.-length str) 2) {name "is too short"})) 
+    (not (re-matches #"^\d+(\.\d+)$" str)) {name "is not a number"})) 
 
 (defn payment-errors
   [{:keys [location amount]}]
@@ -68,7 +69,9 @@
         (dom/div {:class "col-sm-6 component"}
                  (dom/form
                    (obi/input {:type "text" :placeholder "Location" :value location :on-change #(handle-change % owner :location)})
+                   (dom/div (get-in state [:errors :location]))
                    (obi/input {:type "text" :placeholder "Amount" :value amount :on-change #(handle-change % owner :amount)})
+                   (dom/div (get-in state [:errors :amount]))
                    (obb/button-group {:justified? true}
                                      (obb/button-group {} (obb/button { :bs-style "success" :on-click (fn [e] (.preventDefault e) (add-payment actions owner state) nil) } "Add")))))))))
 
