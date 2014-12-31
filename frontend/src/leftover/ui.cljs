@@ -70,7 +70,7 @@
                    (obi/input {:type "text" :placeholder "Location" :value location :on-change #(handle-change % owner :location)})
                    (obi/input {:type "text" :placeholder "Amount" :value amount :on-change #(handle-change % owner :amount)})
                    (obb/button-group {:justified? true}
-                                     (obb/button-group {} (obb/button { :bs-style "success" :on-click (fn [] (add-payment actions owner state)) } "Add")))))))))
+                                     (obb/button-group {} (obb/button { :bs-style "success" :on-click (fn [e] (.preventDefault e) (add-payment actions owner state) nil) } "Add")))))))))
 
 (defn button-bar [app owner]
   (reify om/IRender
@@ -78,8 +78,8 @@
       (let [actions (om/get-shared owner :actions)]
         (dom/div {:class "col-sm-6 component"}
                  (obb/button-group {:justified? true}
-                                   (obb/button-group {} (obb/button { :bs-style "primary" :on-click (fn [] (put! actions {:type :enter-payment})) } "Enter Payment"))
-                                   (obb/button-group {} (obb/button { :bs-style "primary" :on-click (fn [] (put! actions {:type :view-history})) } "View History"))))))))
+                                   (obb/button-group {} (obb/button { :bs-style "primary" :on-click (fn [e] (.preventDefault e) (put! actions {:type :enter-payment}) nil) } "Enter Payment"))
+                                   (obb/button-group {} (obb/button { :bs-style "primary" :on-click (fn [e] (.preventDefault e) (put! actions {:type :view-history})  nil) } "View History"))))))))
 
 (defn running-total [data owner]
   (reify om/IRender
