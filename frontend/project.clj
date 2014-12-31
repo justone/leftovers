@@ -14,7 +14,8 @@
                  [prismatic/om-tools "0.3.9"]]
 
   :plugins [[lein-cljsbuild "1.0.4-SNAPSHOT"]
-            [lein-figwheel  "0.2.0-SNAPSHOT"]]
+            [lein-figwheel  "0.2.0-SNAPSHOT"]
+            [com.cemerick/austin "0.1.4"]]
 
   :source-paths ["src"]
 
@@ -26,7 +27,7 @@
 
   :cljsbuild { 
     :builds [{:id "leftover"
-              :source-paths ["src/leftover" "src/figwheel"]
+              :source-paths ["src/leftover" "src/figwheel" "src/brepl"]
               :compiler {
                 :output-to "resources/public/leftover.js"
                 :output-dir "resources/public/out"
