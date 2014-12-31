@@ -11,7 +11,7 @@
 (enable-console-print!)
 
 (def actions (chan))
-(def app-state (atom {:state :loading
+(defonce app-state (atom {:state :loading
                       :data {}}))
 
 (def base-url (str "http://" (.. js/document -location -hostname) ":8000"))
