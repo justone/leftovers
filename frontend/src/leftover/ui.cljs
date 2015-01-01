@@ -10,12 +10,14 @@
     [om-bootstrap.input :as obi]
     [om-bootstrap.table :as obt]))
 
+(def money-format "%.02f")
+
 (defn hist->tr
   [hist]
   (dom/tr
     ; (dom/td  (:when hist))
     (dom/td  (:location hist))
-    (dom/td  (:amount hist))))
+    (dom/td  (gstring/format money-format (:amount hist)))))
 
 (defn view-history [data owner]
   (reify om/IRender
@@ -44,7 +46,7 @@
   [name str]
   (cond
     (empty? str) {name "is empty"}
-    (not (re-matches #"^\d+(\.\d+)$" str)) {name "is not a number"})) 
+    (not (re-matches #"^-?\d+(\.\d+)?$" str)) {name "is not a number"})) 
 
 (defn payment-errors
   [{:keys [location amount]}]
@@ -88,7 +90,7 @@
   (reify om/IRender
     (render [this]
       (dom/h3 {:class "col-sm-6 currenttotal"} 
-               (str "Current Total: " (gstring/format "$%.02f" (apply - (:start-amount data) (map :amount (:previous-payments data)))))))))
+               (str "Current Total: $" (gstring/format money-format (apply - (:start-amount data) (map :amount (:previous-payments data)))))))))
 
 (defn main-view [app owner]
   (reify om/IRender
