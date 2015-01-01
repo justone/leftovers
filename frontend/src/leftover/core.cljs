@@ -1,6 +1,6 @@
 (ns leftover.core
   (:require-macros  [cljs.core.async.macros :refer  [go]])
-  (:require 
+  (:require
     [leftover.net :as net]
     [leftover.ui :as ui]
     [leftover.util :as util]
@@ -16,6 +16,7 @@
 
 (def base-url (str "http://" (.. js/document -location -hostname) ":8000"))
 
+; handle events from the UI
 (go (loop []
       (let [action (<! actions)]
         (case (:type action)
@@ -24,12 +25,13 @@
           :add-payment (net/POST (str base-url "/conn/foo") (clj->js action)))
         (recur))))
 
+; handle events from the server
 (go
   (loop []
-    (util/log "getting more data")
+    ; (util/log "getting more data")
     (let [json (<! (net/GET (str base-url "/conn/foo/bar")))
           cleaned (util/json->clj json)]
-      (util/log (clj->js cleaned))
+      ; (util/log (clj->js cleaned))
       (if (seq cleaned)
         (swap! app-state assoc :data cleaned)))
     (recur)))
@@ -41,5 +43,6 @@
     app-state
     {:target (. js/document (getElementById "app"))
      :shared {:actions actions}}))
+
 
 (main)
