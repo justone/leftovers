@@ -32,6 +32,11 @@ func (this Data) Filter() interface{} {
 	return this
 }
 
+type IncomingMessage struct {
+	Type string            `json:"type"`
+	Args map[string]string `json:"args"`
+}
+
 func main() {
 
 	m := martini.New()
@@ -75,31 +80,32 @@ func main() {
 
 		fmt.Println("Got: ", string(body))
 
-		var data map[string]interface{}
-		err = json.Unmarshal(body, &data)
+		var incoming IncomingMessage
+		err = json.Unmarshal(body, &incoming)
 		if err != nil {
-			fmt.Println("err: ", err)
+			http.Error(res, "Bad request: "+err.Error(), http.StatusBadRequest)
+			return
 		}
 
-		args := data["args"].(map[string]interface{})
-		fmt.Println("Location : ", args["location"])
-		fmt.Println("Amount : ", args["amount"])
+		if incoming.Type == "add-payment" {
+			fmt.Println("Location : ", incoming.Args["location"])
+			fmt.Println("Amount : ", incoming.Args["amount"])
 
-		amount, _ := strconv.ParseFloat(args["amount"].(string), 64)
+			amount, _ := strconv.ParseFloat(incoming.Args["amount"], 64)
 
-		fmt.Println("appending payment!!!")
-		payments = append(payments, Payment{args["location"].(string), amount})
+			payments = append(payments, Payment{incoming.Args["location"], amount})
 
-		coredata := Data{
-			initialAmount,
-			payments,
+			coredata := Data{
+				initialAmount,
+				payments,
+			}
+
+			json, _ := json.Marshal(coredata)
+
+			fmt.Println(string(json))
+
+			mb.Send(cust, string(json))
 		}
-
-		json, _ := json.Marshal(coredata)
-
-		fmt.Println(string(json))
-
-		mb.Send(cust, string(json))
 	})
 
 	m.Action(route.Handle)
