@@ -1,5 +1,6 @@
 (ns leftover.util
   (:require 
+    [cljs.core.async :refer [chan close!]]
     [clojure.walk :as walk]))
 
 (defn log
@@ -17,3 +18,10 @@
   "Takes in json data and returns a keywordized version"
   [json]
   (walk/keywordize-keys (js->clj (.parse js/JSON json))))
+
+(defn timeout
+  "Returns a channel that is closed after the passed number of milliseconds"
+  [ms]
+  (let [c (chan)]
+    (js/setTimeout (fn [] (close! c)) ms)
+    c))

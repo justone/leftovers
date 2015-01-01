@@ -36,6 +36,15 @@
         (swap! app-state assoc :data cleaned)))
     (recur)))
 
+; call for initial data, up to 5 seconds
+(go
+  (loop [times 10]
+    (<! (util/timeout 500))
+    (util/log "calling for data")
+    (net/POST (str base-url "/conn/foo") {:type "load-info"})
+    (if (and (> times 0) (empty? (:data @app-state)))
+      (recur (dec times)))))
+
 (defn main
   []
   (om/root

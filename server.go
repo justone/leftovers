@@ -105,6 +105,17 @@ func main() {
 			fmt.Println(string(json))
 
 			mb.Send(cust, string(json))
+		} else if incoming.Type == "load-info" {
+			coredata := Data{
+				initialAmount,
+				payments,
+			}
+
+			json, _ := json.Marshal(coredata)
+
+			fmt.Println(string(json))
+
+			mb.Send(cust, string(json))
 		}
 	})
 
