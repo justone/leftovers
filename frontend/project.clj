@@ -26,10 +26,19 @@
              :css-dirs ["resources/public/css"]}
 
   :cljsbuild { 
-    :builds [{:id "leftover"
+    :builds [{:id "dev"
               :source-paths ["src/leftover" "src/figwheel" "src/brepl"]
               :compiler {
                 :output-to "resources/public/leftover.js"
                 :output-dir "resources/public/out"
                 :optimizations :none
-                :source-map true}}]})
+                :source-map true}}
+             {:id "prod"
+              :source-paths ["src/leftover"]
+              :compiler {
+                :output-to "resources/prod/leftover.js"
+                :output-dir "resources/prod/out"
+                :optimizations :advanced
+                :pretty-print false
+                :externs ["externs/react.js"]
+                :source-map "resources/prod/leftover.js.map"}}]})
