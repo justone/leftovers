@@ -14,7 +14,14 @@
 (defonce app-state (atom {:state :enter-payment
                       :data {}}))
 
-(def base-url (str "http://" (.. js/document -location -hostname) ":8000"))
+; if using figwheel, connect to separate port
+; otherwise, use the same port as source
+(def source-port (.. js/document -location -port))
+(if (= "3449" source-port)
+  (def port "8000")
+  (def port source-port))
+
+(def base-url (str "http://" (.. js/document -location -hostname) ":" port))
 
 ; handle events from the UI
 (go (loop []
