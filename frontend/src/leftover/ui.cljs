@@ -8,7 +8,8 @@
     [goog.string :as gstring]
     [om-bootstrap.button :as obb]
     [om-bootstrap.input :as obi]
-    [om-bootstrap.table :as obt]))
+    [om-bootstrap.table :as obt]
+    [om-bootstrap.random :as obr]))
 
 (def money-format "%.02f")
 
@@ -59,6 +60,13 @@
       (put! actions {:type :add-payment :args state})
       (om/set-state! owner :errors errors))))
 
+(defn show-error
+  [name error]
+  (if error
+    (obr/alert {:bs-style "danger"}
+               (dom/strong "Error: ")
+               (str name " " error))))
+
 (defn enter-payment [app owner]
   (reify
     om/IInitState
@@ -71,9 +79,9 @@
         (dom/div {:class "col-sm-6 component"}
                  (dom/form
                    (obi/input {:type "text" :placeholder "Location" :value location :on-change #(handle-change % owner :location)})
-                   (dom/div (get-in state [:errors :location]))
+                   (show-error "Location" (get-in state [:errors :location]))
                    (obi/input {:type "text" :placeholder "Amount" :value amount :on-change #(handle-change % owner :amount)})
-                   (dom/div (get-in state [:errors :amount]))
+                   (show-error "Amount" (get-in state [:errors :amount]))
                    (obb/button-group {:justified? true}
                                      (obb/button-group {} (obb/button { :bs-style "success" :on-click (fn [e] (.preventDefault e) (add-payment actions owner state) nil) } "Add")))))))))
 
