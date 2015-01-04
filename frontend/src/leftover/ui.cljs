@@ -60,7 +60,7 @@
       (put! actions {:type :add-payment :args state})
       (om/set-state! owner :errors errors))))
 
-(defn show-error
+(defn error-box
   [name error]
   (if error
     (obr/alert {:bs-style "danger"}
@@ -78,10 +78,10 @@
       (let [actions (om/get-shared owner :actions)]
         (dom/div {:class "col-sm-6 component"}
                  (dom/form
+                   (error-box "Location" (get-in state [:errors :location]))
                    (obi/input {:type "text" :placeholder "Location" :value location :on-change #(handle-change % owner :location)})
-                   (show-error "Location" (get-in state [:errors :location]))
+                   (error-box "Amount" (get-in state [:errors :amount]))
                    (obi/input {:type "text" :placeholder "Amount" :value amount :on-change #(handle-change % owner :amount)})
-                   (show-error "Amount" (get-in state [:errors :amount]))
                    (obb/button-group {:justified? true}
                                      (obb/button-group {} (obb/button { :bs-style "success" :on-click (fn [e] (.preventDefault e) (add-payment actions owner state) nil) } "Add")))))))))
 
