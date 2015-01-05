@@ -8,11 +8,16 @@
   [s]
   (.log js/console s))
 
-(defn p
-  "Prints given arguments, and then returns the last one"
-  [& values]
-  (.log js/console (apply js->clj values))
-  (last values))
+(defn d
+  "Logs to the console and then returns the last value"
+  ([v] (.log js/console (str v)) v)
+  ([n v] (.log js/console (str n v)) v))
+
+(defn stringify-in
+  "Converts the value at the specified path to a string"
+  [blob path]
+  (assoc-in blob path (str (get-in blob path))))
+
 
 (defn json->clj
   "Takes in json data and returns a keywordized version"

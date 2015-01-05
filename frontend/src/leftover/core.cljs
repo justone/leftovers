@@ -29,7 +29,10 @@
         (case (:type action)
           :enter-payment (swap! app-state assoc :state :enter-payment)
           :view-history (swap! app-state assoc :state :view-history)
-          :add-payment (net/POST (str base-url "/conn/foo") (clj->js action)))
+          :add-payment (net/POST
+                         (str base-url "/conn/foo")
+                         ; need to stringify the boolean value in the action
+                         (clj->js (util/stringify-in action [:args :date-change]))))
         (recur))))
 
 ; handle events from the server

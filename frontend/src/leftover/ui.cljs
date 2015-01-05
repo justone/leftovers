@@ -37,6 +37,10 @@
   [e owner k]
   (om/set-state! owner k (.. e -target -value)))
 
+(defn handle-change-checkbox
+  [e owner k]
+  (om/set-state! owner k (.. e -target -checked)))
+
 (defn valid-string
   [name str]
   (cond
@@ -71,10 +75,13 @@
   (reify
     om/IInitState
     (init-state [_]
-      {:location ""
-       :amount   ""})
+      {:location    ""
+       :amount      ""
+       :date-change false
+       :date-set    ""})
     om/IRenderState
-    (render-state [this {:keys [location amount] :as state}]
+    (render-state [this {:keys [location amount date-change date-set] :as state}]
+      (util/log (str state))
       (let [actions (om/get-shared owner :actions)]
         (dom/div {:class "col-sm-6 component"}
                  (dom/form
@@ -82,6 +89,9 @@
                    (obi/input {:type "text" :placeholder "Location" :value location :on-change #(handle-change % owner :location)})
                    (error-box "Amount" (get-in state [:errors :amount]))
                    (obi/input {:type "text" :placeholder "Amount" :value amount :on-change #(handle-change % owner :amount)})
+                   (obi/input {:type "checkbox" :label "Set transaction date?" :checked date-change :on-change #(handle-change-checkbox % owner :date-change)})
+                   (if date-change
+                     (obi/input {:type "text" :placeholder "Date of transaction" :value date-set :on-change #(handle-change % owner :date-set)}))
                    (obb/button-group {:justified? true}
                                      (obb/button-group {} (obb/button { :bs-style "success" :on-click (fn [e] (.preventDefault e) (add-payment actions owner state) nil) } "Add")))))))))
 
