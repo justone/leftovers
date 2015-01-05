@@ -1,4 +1,5 @@
 (ns leftovers-figwheel
-  (:require [figwheel.client :as fw :include-macros true]))
+  (:require [figwheel.client :as fw]))
 
-(fw/watch-and-reload)
+; reload main UI when new js comes in
+(fw/start {:on-jsload (fn [] (leftover.core/main))})
