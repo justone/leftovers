@@ -5,8 +5,7 @@
     [leftover.ui :as ui]
     [leftover.util :as util]
     [om.core :as om :include-macros true]
-    [cljs.core.async :refer [chan <!]]
-    [clojure.walk :as walk]))
+    [cljs.core.async :refer [chan <!]]))
 
 (enable-console-print!)
 
