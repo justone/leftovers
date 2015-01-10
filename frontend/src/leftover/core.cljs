@@ -36,7 +36,8 @@
           :add-payment (net/POST
                          (str base-url "/conn/foo")
                          ; need to stringify the boolean value in the action
-                         (clj->js (util/stringify-in action [:args :date-change]))))
+                         ; need to remove the :errors key, nested values don't parse on the backend
+                         (clj->js (util/dissoc-in (util/stringify-in action [:args :date-change]) [:args :errors]))))
         (recur))))
 
 ; handle events from the server

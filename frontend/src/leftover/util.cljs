@@ -18,6 +18,12 @@
   [blob path]
   (assoc-in blob path (str (get-in blob path))))
 
+(defn dissoc-in
+  "Removes a nested element according to a sequence of keys"
+  [m [k & ks]]
+  (if-not ks
+    (dissoc m k)
+    (assoc m k (dissoc-in (m k) ks))))
 
 (defn json->clj
   "Takes in json data and returns a keywordized version"
