@@ -5,7 +5,9 @@
     [leftover.ui :as ui]
     [leftover.util :as util]
     [om.core :as om :include-macros true]
-    [cljs.core.async :refer [chan <!]]))
+    [cljs.core.async :refer [chan <!]]
+    [figwheel.client :as fw]
+    [clojure.browser.repl :as repl]))
 
 (enable-console-print!)
 
@@ -16,11 +18,14 @@
 ; if using figwheel, connect to separate port
 ; otherwise, use the same port as source
 (def source-port (.. js/document -location -port))
-(if (= "3449" source-port)
+(def source-host (.. js/document -location -hostname))
+(def dev-mode (= "3449" source-port))
+
+(if dev-mode
   (def port "8000")
   (def port source-port))
 
-(def base-url (str "http://" (.. js/document -location -hostname) ":" port))
+(def base-url (str "http://" source-host ":" port))
 
 ; handle events from the UI
 (go (loop []
@@ -64,3 +69,9 @@
 
 
 (main)
+
+(when dev-mode
+  ; connect the browser repl
+  (repl/connect (str "http://" source-host ":9000/repl"))
+  ; reload main UI when new js comes in
+  (fw/start {:on-jsload (fn [] (main))}))

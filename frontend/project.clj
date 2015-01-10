@@ -27,7 +27,7 @@
 
   :cljsbuild { 
     :builds [{:id "leftover"
-              :source-paths ["src/leftover" "src/figwheel" "src/brepl"]
+              :source-paths ["src/leftover"]
               :compiler {
                 :output-to "resources/public/leftover.js"
                 :output-dir "resources/public/out"
