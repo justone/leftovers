@@ -20,6 +20,7 @@
 (def source-port (.. js/document -location -port))
 (def source-host (.. js/document -location -hostname))
 (def dev-mode (= "3449" source-port))
+(def unique-id (util/random-string 32))
 
 (if dev-mode
   (def port "8000")
@@ -44,7 +45,7 @@
 (go
   (loop []
     ; (util/log "getting more data")
-    (let [json (<! (net/GET (str base-url "/conn/foo/bar")))
+    (let [json (<! (net/GET (str base-url "/conn/foo/" unique-id)))
           cleaned (util/json->clj json)]
       ; (util/log (clj->js cleaned))
       (if (seq cleaned)
