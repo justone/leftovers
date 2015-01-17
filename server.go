@@ -43,7 +43,7 @@ func main() {
 	route := martini.NewRouter()
 
 	m.Use(cors.Allow(&cors.Options{
-		AllowOrigins:     []string{"http://localhost:3449"},
+		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "PATCH"},
 		AllowHeaders:     []string{"Origin"},
 		ExposeHeaders:    []string{"Content-Length"},
