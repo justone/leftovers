@@ -1,6 +1,6 @@
 web:
   build: frontend
-  command: lein figwheel dev
+  command: lein figwheel leftover
   ports:
    - "3449:3449"
   volumes:
