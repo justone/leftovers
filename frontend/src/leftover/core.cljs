@@ -20,6 +20,7 @@
 (def source-host (.. js/document -location -hostname))
 (def dev-mode (= "3449" source-port))
 (def unique-id (util/random-string 32))
+(util/log (str "Unique client id: " unique-id))
 
 (if dev-mode
   (def port "8000")
