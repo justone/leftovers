@@ -32,7 +32,7 @@
                               ; (dom/th  "When")
                               (dom/th  "Location")
                               (dom/th  "Amount")))
-                          (map hist->tr (:previous-payments data)))
+                          (dom/tbody (map hist->tr (:previous-payments data))))
                ))))
 
 (defn handle-change
