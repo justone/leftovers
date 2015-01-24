@@ -21,7 +21,9 @@
     (dom/td  (gstring/format money-format (:amount hist)))))
 
 (defn view-history [data owner]
-  (reify om/IRender
+  (reify
+    om/IDisplayName (display-name [this] "ViewHistory")
+    om/IRender
     (render [this]
       (dom/div {:class "col-sm-6 component"}
                (obt/table {:striped? true :bordered? true}
@@ -73,6 +75,7 @@
 
 (defn enter-payment [app owner]
   (reify
+    om/IDisplayName (display-name [this] "EnterPayment")
     om/IInitState
     (init-state [_]
       {:location    ""
@@ -96,7 +99,9 @@
                                      (obb/button-group {} (obb/button { :bs-style "success" :on-click (fn [e] (.preventDefault e) (add-payment actions owner state) nil) } "Add")))))))))
 
 (defn button-bar [app owner]
-  (reify om/IRender
+  (reify
+    om/IDisplayName (display-name [this] "ButtonBar")
+    om/IRender
     (render [this]
       (let [actions (om/get-shared owner :actions)]
         (dom/div {:class "col-sm-6 component"}
@@ -105,13 +110,17 @@
                                    (obb/button-group {} (obb/button { :bs-style "primary" :on-click (fn [e] (.preventDefault e) (put! actions {:type :view-history})  nil) } "View History"))))))))
 
 (defn running-total [data owner]
-  (reify om/IRender
+  (reify
+    om/IDisplayName (display-name [this] "RunningTotal")
+    om/IRender
     (render [this]
       (dom/h3 {:class "col-sm-6 currenttotal"}
                (str "Current Total: $" (gstring/format money-format (apply - (:start-amount data) (map :amount (:previous-payments data)))))))))
 
 (defn main-view [app owner]
-  (reify om/IRender
+  (reify
+    om/IDisplayName (display-name [this] "MainView")
+    om/IRender
     (render [this]
       (dom/div
         (om/build running-total (:data app))
