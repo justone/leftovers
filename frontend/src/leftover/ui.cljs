@@ -128,4 +128,10 @@
         (case (:state app)
           :loading ()
           :enter-payment (om/build enter-payment app)
-          :view-history (om/build view-history (:data app)))))))
+          :view-history (om/build view-history (:data app)))))
+    om/IWillMount
+    (will-mount [this]
+      (util/log "MOUNT"))
+    om/IWillUnmount
+    (will-unmount [this]
+      (util/log "UNMOUNT"))))
