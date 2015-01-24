@@ -1,6 +1,6 @@
 (ns leftover.ui
   (:require-macros  [cljs.core.async.macros :refer [go]])
-  (:require 
+  (:require
     [leftover.util :as util]
     [om.core :as om :include-macros true]
     [om-tools.dom :as dom :include-macros true]
@@ -45,13 +45,13 @@
   [name str]
   (cond
     (empty? str) {name "is empty"}
-    (< (.-length str) 5) {name "is too short"})) 
+    (< (.-length str) 5) {name "is too short"}))
 
 (defn valid-number
   [name str]
   (cond
     (empty? str) {name "is empty"}
-    (not (re-matches #"^-?\d+(\.\d+)?$" str)) {name "is not a number"})) 
+    (not (re-matches #"^-?\d+(\.\d+)?$" str)) {name "is not a number"}))
 
 (defn payment-errors
   [{:keys [location amount]}]
@@ -107,7 +107,7 @@
 (defn running-total [data owner]
   (reify om/IRender
     (render [this]
-      (dom/h3 {:class "col-sm-6 currenttotal"} 
+      (dom/h3 {:class "col-sm-6 currenttotal"}
                (str "Current Total: $" (gstring/format money-format (apply - (:start-amount data) (map :amount (:previous-payments data)))))))))
 
 (defn main-view [app owner]
@@ -119,4 +119,4 @@
         (case (:state app)
           :loading ()
           :enter-payment (om/build enter-payment app)
-          :view-history (om/build view-history (:data app))))))) 
+          :view-history (om/build view-history (:data app)))))))
