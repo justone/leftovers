@@ -1,6 +1,7 @@
 (ns leftover.core
   (:require-macros  [cljs.core.async.macros :refer  [go]])
   (:require
+    [goog.string :as gs]
     [leftover.net :as net]
     [leftover.ui :as ui]
     [leftover.util :as util]
@@ -43,14 +44,15 @@
 
 ; handle events from the server
 (go
-  (loop []
-    ; (util/log "getting more data")
-    (let [json (<! (net/GET (str base-url "/conn/foo/" unique-id)))
-          cleaned (util/json->clj json)]
-      ; (util/log (clj->js cleaned))
-      (if (seq cleaned)
-        (swap! app-state assoc :data cleaned)))
-    (recur)))
+  (let [uniq-id-go (util/random-string 32)]
+    (loop []
+      (util/log (gs/format "getting more data (cid: %s) (goid: %s)" unique-id uniq-id-go))
+      (let [json (<! (net/GET (str base-url "/conn/foo/" unique-id)))
+            cleaned (util/json->clj json)]
+        ; (util/log (clj->js cleaned))
+        (if (seq cleaned)
+          (swap! app-state assoc :data cleaned)))
+      (recur))))
 
 ; call for initial data, up to 5 seconds
 (go
