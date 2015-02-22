@@ -9,3 +9,4 @@ pom.xml
 .lein-plugins/
 .nrepl-port
 .repl-*
+figwheel_server.log

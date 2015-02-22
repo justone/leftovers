@@ -5,10 +5,8 @@
     [leftover.net :as net]
     [leftover.ui :as ui]
     [leftover.util :as util]
-    [om.core :as om :include-macros true]
-    [cljs.core.async :refer [chan <!]]
-    [figwheel.client :as fw]
-    [clojure.browser.repl :as repl]))
+    [om.core :as om]
+    [cljs.core.async :refer [chan <!]]))
 
 (enable-console-print!)
 
@@ -71,11 +69,3 @@
     {:target (. js/document (getElementById "app"))
      :shared {:actions actions}}))
 
-
-(main)
-
-(when dev-mode
-  ; connect the browser repl
-  (repl/connect (str "http://" source-host ":9000/repl"))
-  ; reload main UI when new js comes in
-  (fw/start {:on-jsload (fn [] (main))}))
